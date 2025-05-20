@@ -1,221 +1,245 @@
 const modelSchemas = {
-  attendace: {
-    attendaceId: "String",
-    employeeId: "String",
-    datetime: "Date",
-    note: "String",
+  student: {
+    id: "String",
+    studentId: "String",
+    firstName: "String",
+    lastName: "String",
+    email: "String",
+    phone: "String",
+    address: "String",
+    birthDate: "Date",
+    gender: "String",
+    classId: "String",
+    createdAt: "Date",
+    updatedAt: "Date"
   },
-  auth: {
-    authId: "String",
+  teacher: {
+    id: "String",
+    staffId: "String",
+    firstName: "String",
+    lastName: "String",
+    email: "String",
+    phone: "String",
+    address: "String",
+    hireDate: "Date",
+    role: "String", // TEACHER, ADMINISTRATOR, etc.
+    createdAt: "Date",
+    updatedAt: "Date"
+  },
+  class: {
+    id: "String",
+    className: "String",
+    classCode: "String",
+    academicYear: "String",
+    roomNumber: "String",
+    teacherId: "String",
+    createdAt: "Date",
+    updatedAt: "Date"
+  },
+  subject: {
+    id: "String",
+    subjectName: "String",
+    subjectCode: "String",
+    description: "String",
+    teacherId: "String",
+    classId: "String",
+    createdAt: "Date",
+    updatedAt: "Date"
+  },
+  grade: {
+    id: "String",
+    grade: "String", // A, B, C, etc.
+    score: "Float",
+    remarks: "String",
+    dateGiven: "Date",
+    studentId: "String",
+    subjectId: "String",
+    createdAt: "Date",
+    updatedAt: "Date"
+  },
+  attendance: {
+    id: "String",
+    date: "Date",
+    status: "String", // PRESENT, ABSENT, etc.
+    remarks: "String",
+    studentId: "String",
+    createdAt: "Date",
+    updatedAt: "Date"
+  },
+  parent: {
+    id: "String",
+    firstName: "String",
+    lastName: "String",
+    email: "String",
+    phone: "String",
+    address: "String",
+    occupation: "String",
+    createdAt: "Date",
+    updatedAt: "Date"
+  },
+  user: {
+    id: "String",
     email: "String",
     password: "String",
-    roleId: "String",
-    employeeId: "String",
-    status: "String",
-  },
-  authLog: {
-    id: "String",
-    authId: "String",
-    method: "String",
-    url: "String",
-    status: "Int",
-    responseTime: "Float",
-    ip: "String",
-    userAgent: "String",
-  },
-  cart: {
-    cartId: "String",
-    authId: "String",
-    userId: "String",
-    productId: "String",
-    quantity: "Int",
-    status: "String",
-  },
-  cartNote: {
-    noteId: "String",
-    cartId: "String",
-    note: "String",
-  },
-  category: {
-    categoryId: "String",
-    picture: "String",
-    categoryName: "String",
-    categoryCode: "String",
-    memo: "String",
-    status: "String",
-  },
-  customer: {
-    customerId: "String",
-    firstName: "String",
-    lastName: "String",
-    gender: "String",
-    phone: "String",
-    status: "String",
-    employeeId: "String",
-  },
-  customerinfo: {
-    customerId: "String",
-    picture: "String",
-    region: "String",
-    email: "String",
-    note: "String",
-    govId: "String",
-    povPicture: "String",
-    govExpire: "DateTime",
-    status: "String",
-  },
-  department: {
-    departmentId: "String",
-    departmentName: "String",
-    departmentCode: "String",
-    memo: "String",
-    status: "String",
-  },
-  employee: {
-    employeeId: "String",
-    employeeCode: "String",
-    firstName: "String",
-    lastName: "String",
-    gender: "String",
-    dob: "DateTime",
-    phone: "String",
-    positionId: "String",
-    departmentId: "String",
-    salary: "Int",
-    hiredDate: "DateTime",
-    status: "String",
-  },
-  employeeInfo: {
-    infoId: "String",
-    employeeId: "String",
-    picture: "String",
-    region: "String",
-    email: "String",
-    address: "String",
-    cityId: "String",
-    stateId: "String",
-    country: "String",
-    note: "String",
-  },
-  groupMessage: {
-    groupMessageId: "String",
-    authId: "String",
-    content: "String",
-    time: "Date",
-  },
-  log: {
-    id: "String",
-    method: "String",
-    url: "String",
-    status: "Int",
-    responseTime: "Float",
-    ip: "String",
-    userAgent: "String",
-  },
-  notification: {
-    notificationId: "String",
-    authId: "String",
-    title: "String",
-    content: "String",
-  },
-  payment: {
-    paymentId: "String",
-    employeeId: "String",
-    saleId: "String",
-    reservationId: "String",
-    invoice: "String",
-    hash: "String",
-    fromAccountId: "String",
-    toAccountId: "String",
-    currency: "String",
-    amount: "Decimal",
-    externalRef: "String",
-    status: "String",
-  },
-  position: {
-    positionId: "String",
-    departmentId: "String",
-    positionName: "String",
-    positionCode: "String",
-    memo: "String",
-    status: "String",
-  },
-  product: {
-    productId: "String",
-    productName: "String",
-    productCode: "String",
-    categoryId: "String",
-    picture: "String",
-    unit: "String",
-    capacity: "String",
-    sellPrice: "Decimal",
-    costPrice: "Decimal",
-    discountRate: "Int",
-    status: "String",
-    desc: "String",
-  },
-  category: {
-    productCategoryId: "String",
-    picture: "String",
-    categoryName: "String",
-    categoryCode: "String",
-    memo: "String",
-    status: "String",
-  },
-  productStock: {
-    productStockId: "String",
-    productId: "String",
-    supplierId: "String",
-    invNumber: "String",
-    productAdd: "Int",
-    addPrice: "Decimal",
-    addDate: "Date",
-    memo: "String",
-    status: "String",
-  },
-  role: {
-    roleId: "String",
-    name: "String",
-  },
-  sale: {
-    saleId: "String",
-    employeeId: "String",
-    customerId: "String",
-    saleDate: "Date",
-    amount: "Decimal",
-    picture: "String",
-    memo: "String",
-    status: "String",
-  },
-  saleDetail: {
-    saleDetailId: "String",
-    saleId: "String",
-    productId: "String",
-    quantity: "Int",
-    amount: "Decimal",
-  },
-  shift: {
-    shiftId: "String",
-    authId: "String",
-    shiftCode: "String",
-    openKhmerRiel: "Decimal",
-    openUsDollar: "Decimal",
-    openTime: "Date",
-    closeKhmerRiel: "Decimal",
-    closeUsDollar: "Decimal",
-    closeTime: "Date",
-    status: "String",
-  },
-  supplier: {
-    supplierId: "String",
-    supplierName: "String",
-    companyName: "String",
-    phone: "String",
-    email: "String",
-    address: "String",
-    status: "String",
+    role: "String",
+    studentId: "String",
+    teacherId: "String",
+    parentId: "String",
     createdAt: "Date",
-  },
+    updatedAt: "Date"
+  }
 };
 
-module.exports = { modelSchemas };
+
+const enums = {
+  AttendanceStatus: ["PRESENT", "ABSENT", "LATE", "EXCUSED"],
+  GradeLevel: ["A", "B", "C", "D", "F", "INCOMPLETE"],
+  StaffRole: ["TEACHER", "ADMINISTRATOR", "COUNSELOR", "LIBRARIAN", "OTHER"]
+};
+
+module.exports = { modelSchemas, enums };
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// const modelSchemas = {
+//   // Main Models
+//   Student: {
+//     id: { type: "String", required: true },
+//     studentCode: { type: "String", required: true, unique: true },
+//     firstName: { type: "String", required: true },
+//     lastName: { type: "String", required: true },
+//     email: { type: "String", required: true, unique: true },
+//     phone: { type: "String" },
+//     status: { type: "String", enum: ["ACTIVE", "INACTIVE", "GRADUATED", "TRANSFERRED"], default: "ACTIVE" },
+//     joinDate: { type: "Date", default: "now()" },
+//     classId: { type: "String" },
+//     createdAt: { type: "Date", default: "now()" },
+//     updatedAt: { type: "Date", default: "now()" }
+//   },
+
+//   StudentDetail: {
+//     id: { type: "String", required: true },
+//     studentId: { type: "String", required: true, unique: true },
+//     birthDate: { type: "Date" },
+//     gender: { type: "String", enum: ["MALE", "FEMALE", "OTHER"] },
+//     address: { type: "String" },
+//     emergencyContact: { type: "String" },
+//     medicalInfo: { type: "String" },
+//     photoUrl: { type: "String" },
+//     createdAt: { type: "Date", default: "now()" },
+//     updatedAt: { type: "Date", default: "now()" }
+//   },
+
+//   Parent: {
+//     id: { type: "String", required: true },
+//     parentCode: { type: "String", required: true, unique: true },
+//     firstName: { type: "String", required: true },
+//     lastName: { type: "String", required: true },
+//     email: { type: "String", required: true, unique: true },
+//     phone: { type: "String", required: true },
+//     occupation: { type: "String" },
+//     address: { type: "String" },
+//     createdAt: { type: "Date", default: "now()" },
+//     updatedAt: { type: "Date", default: "now()" }
+//   },
+
+//   ParentStudent: {
+//     id: { type: "String", required: true },
+//     parentId: { type: "String", required: true },
+//     studentId: { type: "String", required: true },
+//     relationship: { type: "String", enum: ["MOTHER", "FATHER", "GUARDIAN", "OTHER"] },
+//     isPrimary: { type: "Boolean", default: false },
+//     createdAt: { type: "Date", default: "now()" }
+//   },
+
+//   Teacher: {
+//     id: { type: "String", required: true },
+//     teacherCode: { type: "String", required: true, unique: true },
+//     firstName: { type: "String", required: true },
+//     lastName: { type: "String", required: true },
+//     email: { type: "String", required: true, unique: true },
+//     phone: { type: "String", required: true },
+//     specialization: { type: "String" },
+//     hireDate: { type: "Date" },
+//     status: { type: "String", enum: ["ACTIVE", "ON_LEAVE", "RESIGNED"], default: "ACTIVE" },
+//     createdAt: { type: "Date", default: "now()" },
+//     updatedAt: { type: "Date", default: "now()" }
+//   },
+
+//   Class: {
+//     id: { type: "String", required: true },
+//     className: { type: "String", required: true },
+//     gradeLevel: { type: "String", required: true },
+//     academicYear: { type: "String", required: true },
+//     roomNumber: { type: "String" },
+//     createdAt: { type: "Date", default: "now()" },
+//     updatedAt: { type: "Date", default: "now()" }
+//   },
+
+//   Subject: {
+//     id: { type: "String", required: true },
+//     subjectName: { type: "String", required: true },
+//     subjectCode: { type: "String", required: true, unique: true },
+//     description: { type: "String" },
+//     creditHours: { type: "Number" },
+//     createdAt: { type: "Date", default: "now()" },
+//     updatedAt: { type: "Date", default: "now()" }
+//   },
+
+//   ClassSubject: {
+//     id: { type: "String", required: true },
+//     classId: { type: "String", required: true },
+//     subjectId: { type: "String", required: true },
+//     teacherId: { type: "String", required: true },
+//     schedule: { type: "String" },
+//     room: { type: "String" },
+//     createdAt: { type: "Date", default: "now()" }
+//   },
+
+//   Attendance: {
+//     id: { type: "String", required: true },
+//     studentId: { type: "String", required: true },
+//     classId: { type: "String", required: true },
+//     date: { type: "Date", required: true },
+//     status: { type: "String", enum: ["PRESENT", "ABSENT", "LATE", "EXCUSED"], required: true },
+//     recordedBy: { type: "String" },
+//     notes: { type: "String" },
+//     createdAt: { type: "Date", default: "now()" }
+//   },
+
+//   Grade: {
+//     id: { type: "String", required: true },
+//     studentId: { type: "String", required: true },
+//     subjectId: { type: "String", required: true },
+//     classId: { type: "String", required: true },
+//     term: { type: "String", required: true },
+//     gradeValue: { type: "String", enum: ["A", "B", "C", "D", "F", "INCOMPLETE"] },
+//     score: { type: "Number" },
+//     comments: { type: "String" },
+//     recordedBy: { type: "String" },
+//     recordedAt: { type: "Date", default: "now()" }
+//   }
+// };
+
+// // Enum references
+// const enums = {
+//   StudentStatus: ["ACTIVE", "INACTIVE", "GRADUATED", "TRANSFERRED"],
+//   Gender: ["MALE", "FEMALE", "OTHER"],
+//   AttendanceStatus: ["PRESENT", "ABSENT", "LATE", "EXCUSED"],
+//   GradeValue: ["A", "B", "C", "D", "F", "INCOMPLETE"],
+//   RelationshipType: ["MOTHER", "FATHER", "GUARDIAN", "OTHER"],
+//   TeacherStatus: ["ACTIVE", "ON_LEAVE", "RESIGNED"]
+// };
+
+// module.exports = { modelSchemas, enums };

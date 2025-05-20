@@ -6,7 +6,7 @@
   "scripts": {
     "test": "jest",
     "dev": "nodemon index.js",
-    "migrate": "npx prisma migrate dev --name mod-entry",
+    "migrate": "npx prisma migrate dev --name init",
     "generate": "npx prisma generate",
     "git": "git add . && git commit -m \"clean code\" &&   git push",
     "prisma": "npm run migrate && npm run generate"

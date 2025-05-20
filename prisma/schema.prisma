@@ -5,13 +5,24 @@ datasource db {
 generator client {
   provider = "prisma-client-js"
 }
+enum StudentStatus {
+  ACTIVE
+  INACTIVE
+  GRADUATED
+  TRANSFERRED
+}
+enum Gender {
+  MALE
+  FEMALE
+  OTHER
+}
 enum AttendanceStatus {
   PRESENT
   ABSENT
   LATE
   EXCUSED
 }
-enum GradeLevel {
+enum GradeValue {
   A
   B
   C
@@ -19,283 +30,303 @@ enum GradeLevel {
   F
   INCOMPLETE
 }
-enum StaffRole {
-  TEACHER
-  ADMINISTRATOR
-  COUNSELOR
-  LIBRARIAN
+enum RelationshipType {
+  MOTHER
+  FATHER
+  GUARDIAN
   OTHER
 }
+enum TeacherStatus {
+  ACTIVE
+  ON_LEAVE
+  RESIGNED
+}
 model Student {
-  id        String   @id @default(uuid())
-  studentId String   @unique
-  firstName String
-  lastName  String
-  email     String   @unique
-  phone     String?
-  address   String?
-  birthDate DateTime
-  gender    String?
-  class     Class?   @relation(fields: [classId], references: [id])
-  classId   String?
-  user      User[]
-  grades    Grade[]
-  attendances Attendance[]
-  parents   Parent[]
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@map("students")
-}
-model Teacher {
-  id        String   @id @default(uuid())
-  staffId   String   @unique
-  firstName String
-  lastName  String
-  email     String   @unique
-  phone     String?
-  address   String?
-  hireDate  DateTime
-  role      StaffRole @default(TEACHER)
-  user      User[]
-  classes   Class[]
-  subjects  Subject[]
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  @@map("teachers")
-}
-model Class {
-  id          String    @id @default(uuid())
-  className   String
-  classCode   String    @unique
-  academicYear String
-  roomNumber  String?
-  students    Student[]
-  teacher     Teacher?  @relation(fields: [teacherId], references: [id])
-  teacherId   String?
-  subjects    Subject[]
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-  @@map("classes")
-}
-model Subject {
-  id          String    @id @default(uuid())
-  subjectName String
-  subjectCode String    @unique
-  description String?
-  teacher     Teacher?  @relation(fields: [teacherId], references: [id])
-  teacherId   String?
-  class       Class?    @relation(fields: [classId], references: [id])
+  id          String         @id @default(uuid())
+  studentCode String         @unique
+  firstName   String
+  lastName    String
+  email       String         @unique
+  phone       String?
+  status      StudentStatus  @default(ACTIVE)
+  joinDate    DateTime       @default(now())
+  detail      StudentDetail?
+  class       Class?         @relation(fields: [classId], references: [id])
   classId     String?
+  parents     ParentStudent[]
+  attendances Attendance[]
   grades      Grade[]
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-  @@map("subjects")
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
 }
-model Grade {
-  id         String    @id @default(uuid())
-  grade      GradeLevel
-  score      Float?
-  remarks    String?
-  dateGiven  DateTime
-  student    Student   @relation(fields: [studentId], references: [id])
-  studentId  String
-  subject    Subject   @relation(fields: [subjectId], references: [id])
-  subjectId  String
-  createdAt  DateTime  @default(now())
-  updatedAt  DateTime  @updatedAt
-  @@map("grades")
-}
-model Attendance {
-  id         String          @id @default(uuid())
-  date       DateTime
-  status     AttendanceStatus
-  remarks    String?
-  student    Student         @relation(fields: [studentId], references: [id])
-  studentId  String
-  createdAt  DateTime        @default(now())
-  updatedAt  DateTime        @updatedAt
-  @@map("attendances")
+model StudentDetail {
+  id              String     @id @default(uuid())
+  student         Student    @relation(fields: [studentId], references: [id])
+  studentId       String     @unique
+  birthDate       DateTime?
+  gender          Gender?
+  address         String?
+  emergencyContact String?
+  medicalInfo     String?
+  photoUrl        String?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
 }
 model Parent {
-  id        String   @id @default(uuid())
-  firstName String
-  lastName  String
-  email     String   @unique
-  phone     String
-  address   String?
-  occupation String?
-  user      User[]
-  students  Student[]
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@map("parents")
+  id          String           @id @default(uuid())
+  parentCode  String           @unique
+  firstName   String
+  lastName    String
+  email       String           @unique
+  phone       String
+  occupation  String?
+  address     String?
+  children    ParentStudent[]
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
 }
-model User {
-  id        String   @id @default(uuid())
-  email     String   @unique
-  password  String
-  role      String
-  student   Student? @relation(fields: [studentId], references: [id])
-  studentId String? @unique
-  teacher   Teacher? @relation(fields: [teacherId], references: [id])
-  teacherId String?
-  parent    Parent?  @relation(fields: [parentId], references: [id])
-  parentId  String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  @@map("users")
+model ParentStudent {
+  id           String         @id @default(uuid())
+  parent       Parent         @relation(fields: [parentId], references: [id])
+  parentId     String
+  student      Student        @relation(fields: [studentId], references: [id])
+  studentId    String
+  relationship RelationshipType
+  isPrimary    Boolean        @default(false)
+  createdAt    DateTime       @default(now())
+  @@unique([parentId, studentId])
+}
+model Teacher {
+  id            String       @id @default(uuid())
+  teacherCode   String       @unique
+  firstName     String
+  lastName      String
+  email         String       @unique
+  phone         String
+  specialization String?
+  hireDate      DateTime?
+  status        TeacherStatus @default(ACTIVE)
+  classes       ClassSubject[]
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+}
+model Class {
+  id           String        @id @default(uuid())
+  className    String
+  gradeLevel   String      
+  academicYear String       
+  roomNumber   String?
+  students     Student[]
+  subjects     ClassSubject[]
+  attendance   Attendance[]
+  grades       Grade[]
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+}
+model Subject {
+  id           String        @id @default(uuid())
+  subjectName  String
+  subjectCode  String        @unique
+  description  String?
+  creditHours  Int?
+  grade        Grade[]
+  classes      ClassSubject[]
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+}
+model ClassSubject {
+  id          String    @id @default(uuid())
+  class       Class     @relation(fields: [classId], references: [id])
+  classId     String
+  subject     Subject   @relation(fields: [subjectId], references: [id])
+  subjectId   String
+  teacher     Teacher   @relation(fields: [teacherId], references: [id])
+  teacherId   String
+  schedule    String?   
+  room        String?
+  createdAt   DateTime  @default(now())
+  @@unique([classId, subjectId])
+}
+model Attendance {
+  id          String          @id @default(uuid())
+  student     Student         @relation(fields: [studentId], references: [id])
+  studentId   String
+  class       Class           @relation(fields: [classId], references: [id])
+  classId     String
+  date        DateTime
+  status      AttendanceStatus
+  recordedBy  String?       
+  notes       String?
+  createdAt   DateTime        @default(now())
+}
+model Grade {
+  id          String      @id @default(uuid())
+  student     Student     @relation(fields: [studentId], references: [id])
+  studentId   String
+  subject     Subject     @relation(fields: [subjectId], references: [id])
+  subjectId   String
+  class       Class       @relation(fields: [classId], references: [id])
+  classId     String
+  term        String      
+  gradeValue  GradeValue?
+  score       Float?
+  comments    String?
+  recordedBy  String?    
+  recordedAt  DateTime    @default(now())
 }
 
 
-
-
-
-
-
-
-// generator client {
-//   provider = "prisma-client-js"
-// }
 
 // datasource db {
 //   provider = "postgresql"
 //   url      = env("DATABASE_URL")
 // }
-
-// model User {
-//   userId    String   @id @default(uuid())
-//   email     String   @unique
-//   password  String
-//   fullName  String
-//   role      Role     @default(STUDENT)
-//   createdAt DateTime @default(now())
-//   updatedAt DateTime @updatedAt
-//   student   Student?
-//   teacher   Teacher?
+// generator client {
+//   provider = "prisma-client-js"
 // }
-
-// model Student {
-//   studentId   String       @id @default(uuid())
-//   userId      String       @unique
-//   grade       String
-//   section     String
-//   dob         DateTime
-//   attendance  Attendance[]
-//   enrollments Enrollment[]
-//   grades      Grade[]
-//   guardians   Guardian[]
-//   payment     Payment[]
-//   user        User         @relation(fields: [userId], references: [userId])
-// }
-
-// model Teacher {
-//   teacherId String  @id @default(uuid())
-//   userId    String  @unique
-//   subject   String
-//   bio       String?
-//   classes   Class[]
-//   user      User    @relation(fields: [userId], references: [userId])
-// }
-
-// model Class {
-//   classId     String       @id @default(uuid())
-//   name        String
-//   subjectId   String
-//   teacherId   String
-//   scheduleId  String?
-//   attendance  Attendance[]
-//   schedule    Schedule?    @relation(fields: [scheduleId], references: [scheduleId])
-//   subject     Subject      @relation(fields: [subjectId], references: [subjectId])
-//   teacher     Teacher      @relation(fields: [teacherId], references: [teacherId])
-//   enrollments Enrollment[]
-//   grade       Grade[]
-// }
-
-// model Subject {
-//   subjectId String  @id @default(uuid())
-//   name      String
-//   code      String  @unique
-//   classes   Class[]
-// }
-
-// model Schedule {
-//   scheduleId String   @id @default(uuid())
-//   classId    String
-//   day        String
-//   startTime  DateTime
-//   endTime    DateTime
-//   class      Class[]
-// }
-
-// model Enrollment {
-//   enrollmentId String  @id @default(uuid())
-//   studentId    String
-//   classId      String
-//   class        Class   @relation(fields: [classId], references: [classId])
-//   student      Student @relation(fields: [studentId], references: [studentId])
-// }
-
-// model Attendance {
-//   attendanceId String           @id @default(uuid())
-//   date         DateTime
-//   status       AttendanceStatus
-//   studentId    String
-//   classId      String
-//   class        Class            @relation(fields: [classId], references: [classId])
-//   student      Student          @relation(fields: [studentId], references: [studentId])
-// }
-
-// model Grade {
-//   gradeId   String   @id @default(uuid())
-//   studentId String
-//   classId   String
-//   score     Float
-//   examType  ExamType
-//   class     Class    @relation(fields: [classId], references: [classId])
-//   student   Student  @relation(fields: [studentId], references: [studentId])
-// }
-
-// model Guardian {
-//   gurdianId String  @id @default(uuid())
-//   fullName  String
-//   contact   String
-//   studentId String
-//   student   Student @relation(fields: [studentId], references: [studentId])
-// }
-
-// model Payment {
-//   paymentId String        @id @default(uuid())
-//   studentId String
-//   amount    Float
-//   status    PaymentStatus
-//   paidAt    DateTime?
-//   student   Student       @relation(fields: [studentId], references: [studentId])
-// }
-
-// enum Role {
-//   ADMIN
-//   TEACHER
-//   STUDENT
-// }
-
 // enum AttendanceStatus {
 //   PRESENT
 //   ABSENT
 //   LATE
 //   EXCUSED
 // }
+// enum GradeLevel {
+//   A
+//   B
+//   C
+//   D
+//   F
+//   INCOMPLETE
+// }
+// enum StaffRole {
+//   TEACHER
+//   ADMINISTRATOR
+//   COUNSELOR
+//   LIBRARIAN
+//   OTHER
+// }
+// model Student {
+//   id        String   @id @default(uuid())
+//   firstName String
+//   lastName  String
+//   email     String   @unique
+//   phone     String?
+//   address   String?
+//   birthDate DateTime
+//   gender    String?
+//   class     Class?   @relation(fields: [classId], references: [id])
+//   classId   String?
+//   user      User[]
+//   grades    Grade[]
+//   attendances Attendance[]
+//   parents   Parent[]
+//   createdAt DateTime @default(now())
+//   updatedAt DateTime @updatedAt
 
-// enum ExamType {
-//   MIDTERM
-//   FINAL
-//   QUIZ
-//   ASSIGNMENT
+//   @@map("students")
+// }
+// model Teacher {
+//   id        String   @id @default(uuid())
+//   firstName String
+//   lastName  String
+//   email     String   @unique
+//   phone     String?
+//   address   String?
+//   hireDate  DateTime
+//   role      StaffRole @default(TEACHER)
+//   user      User[]
+//   classes   Class[]
+//   subjects  Subject[]
+//   createdAt DateTime @default(now())
+//   updatedAt DateTime @updatedAt
+//   @@map("teachers")
+// }
+// model Class {
+//   id          String    @id @default(uuid())
+//   className   String
+//   classCode   String    @unique
+//   academicYear String
+//   roomNumber  String?
+//   students    Student[]
+//   teacher     Teacher?  @relation(fields: [teacherId], references: [id])
+//   teacherId   String?
+//   subjects    Subject[]
+//   createdAt   DateTime  @default(now())
+//   updatedAt   DateTime  @updatedAt
+//   @@map("classes")
+// }
+// model Subject {
+//   id          String    @id @default(uuid())
+//   subjectName String
+//   subjectCode String    @unique
+//   description String?
+//   teacher     Teacher?  @relation(fields: [teacherId], references: [id])
+//   teacherId   String?
+//   class       Class?    @relation(fields: [classId], references: [id])
+//   classId     String?
+//   grades      Grade[]
+//   createdAt   DateTime  @default(now())
+//   updatedAt   DateTime  @updatedAt
+//   @@map("subjects")
+// }
+// model Grade {
+//   id         String    @id @default(uuid())
+//   grade      GradeLevel
+//   score      Float?
+//   remarks    String?
+//   dateGiven  DateTime
+//   student    Student   @relation(fields: [studentId], references: [id])
+//   studentId  String
+//   subject    Subject   @relation(fields: [subjectId], references: [id])
+//   subjectId  String
+//   createdAt  DateTime  @default(now())
+//   updatedAt  DateTime  @updatedAt
+//   @@map("grades")
+// }
+// model Attendance {
+//   id         String          @id @default(uuid())
+//   date       DateTime
+//   status     AttendanceStatus
+//   remarks    String?
+//   student    Student         @relation(fields: [studentId], references: [id])
+//   studentId  String
+//   createdAt  DateTime        @default(now())
+//   updatedAt  DateTime        @updatedAt
+//   @@map("attendances")
+// }
+// model Parent {
+//   id        String   @id @default(uuid())
+//   firstName String
+//   lastName  String
+//   email     String   @unique
+//   phone     String
+//   address   String?
+//   occupation String?
+//   user      User[]
+//   students  Student[]
+//   createdAt DateTime @default(now())
+//   updatedAt DateTime @updatedAt
+
+//   @@map("parents")
+// }
+// model User {
+//   id        String   @id @default(uuid())
+//   email     String   @unique
+//   password  String
+//   role      String
+//   student   Student? @relation(fields: [studentId], references: [id])
+//   studentId String? @unique
+//   teacher   Teacher? @relation(fields: [teacherId], references: [id])
+//   teacherId String?
+//   parent    Parent?  @relation(fields: [parentId], references: [id])
+//   parentId  String?
+//   createdAt DateTime @default(now())
+//   updatedAt DateTime @updatedAt
+//   @@map("users")
 // }
 
-// enum PaymentStatus {
-//   PENDING
-//   PAID
-//   FAILED
-// }
+
+
+
+
+
