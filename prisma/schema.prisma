@@ -158,6 +158,12 @@ model Attendance {
   recordedBy  String?       
   notes       String?
   createdAt   DateTime        @default(now())
+
+  @@index([studentId])
+  @@index([classId])
+  @@index([date])
+  @@index([studentId, classId])
+  @@index([studentId, date])
 }
 model Grade {
   id          String      @id @default(uuid())
