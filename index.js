@@ -12,12 +12,6 @@ const bodyParser = require("body-parser");
 const protectedStatic = require("./src/middleware/static-middleware");
 const errorHandler = require("@/middleware/error-handler-middleware");
 const { limiter } = require("@/middleware/limit-middleware");
-const {
-  allowedOrigins,
-  allowedHeaders,
-  methods,
-} = require("@/constants/cors");
-
 const dbLogger = require("@/middleware/logger-middleware");
 const logger = require("@/middleware/app-logger-middleware");
 const app = express();
@@ -46,17 +40,7 @@ app.use((err, req, res, next) => {
   next(err);
 });
 
-app.use(
-  cors({
-    origin: (origin, callback) => {
-      if (!origin || allowedOrigins.includes(origin)) callback(null, true);
-      else callback(new Error("Not allowed by CORS"));
-    },
-    methods,
-    allowedHeaders,
-    credentials: true,
-  })
-);
+app.use(cors());
 
 app.use(
   "/uploads",

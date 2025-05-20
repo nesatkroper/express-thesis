@@ -22,7 +22,7 @@
    npm run dev
    ```
 
-The API will be running at `http://localhost:34200` (or the port specified in your environment).
+The API will be running at `http://localhost:34200/v1` (or the port specified in your environment).
 
 ## API Endpoints
 
