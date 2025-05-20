@@ -1,0 +1,13 @@
+{
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./src/*"],
+      "@base/*": ["./src/controllers/base/*"],
+      "@controllers/*": ["./src/controllers/*"],
+      "@router/*": ["./src/router/*"]
+    }
+    // "checkJs": true
+  },
+  "include": ["src/**/*"]
+}
