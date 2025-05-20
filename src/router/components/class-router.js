@@ -9,7 +9,7 @@ const {
 } = require("@/controllers/class-controller");
 
 router.get("/:id?", select);
-router.post("/", create);
-router.put("/:id", update);
+// router.post("/", create);
+// router.put("/:id", update);
 
 module.exports = router;

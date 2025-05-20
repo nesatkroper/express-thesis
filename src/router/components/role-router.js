@@ -10,11 +10,10 @@ const {
   refresh,
 } = require("@/controllers/role-controller");
 
-
-router.get("/:id?", select);
-router.post("/", create);
-router.put("/:id", update);
-router.patch("/:id", patch);
-router.delete("/:id", destroy);
+// router.get("/:id?", select);
+// router.post("/", create);
+// router.put("/:id", update);
+// router.patch("/:id", patch);
+// router.delete("/:id", destroy);
 
 module.exports = router;

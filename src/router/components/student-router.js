@@ -9,11 +9,10 @@ const {
   destroy,
 } = require("@/controllers/student-controller");
 
-
 router.get("/:id?", select);
-router.post("/", create);
-router.put("/:id", update);
-router.patch("/:id", patch);
-router.delete("/:id", destroy);
+// router.post("/", create);
+// router.put("/:id", update);
+// router.patch("/:id", patch);
+// router.delete("/:id", destroy);
 
 module.exports = router;

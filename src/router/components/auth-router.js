@@ -11,10 +11,10 @@ const {
   getAuth,
 } = require("@/controllers/auth-controller");
 
-router.post("/register", register);
-router.post("/login", login);
-router.post("/logout", logout);
-router.get("/all-auth", authenticateJWT, authorizeRoles(["Admin"]), getAllAuth);
-router.get("/me", authenticateJWT, getAuth);
+// router.post("/register", register);
+// router.post("/login", login);
+// router.post("/logout", logout);
+// router.get("/all-auth", authenticateJWT, authorizeRoles(["Admin"]), getAllAuth);
+// router.get("/me", authenticateJWT, getAuth);
 
 module.exports = router;
