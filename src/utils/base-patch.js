@@ -1,4 +1,4 @@
-const prisma = require("@/provider/client");
+const prisma = require("@/lib/prisma");
 
 const basePatch = async (model, id, action, options = {}) => {
   if (!action) {

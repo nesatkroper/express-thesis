@@ -1,4 +1,4 @@
-const { invalidate } = require("@/utils/base-redis");
+
 const {
   baseSelect,
   baseCreate,
@@ -11,10 +11,6 @@ const model = "employee";
 const field = "employeeCode";
 const prefix = "EMP";
 
-const refresh = async (req, res) => {
-  await invalidate(`${model}:*`);
-  return res.status(203).json({ msg: "Cache invalidated" });
-};
 
 const select = async (req, res) => {
   try {
@@ -45,7 +41,6 @@ const create = async (req, res) => {
       idField: `${model}Id`,
     });
 
-    await invalidate(`${model}:*`);
     return res.status(201).json(result);
   } catch (err) {
     console.error(`Error creating ${model}:`, err);
@@ -57,7 +52,7 @@ const update = async (req, res) => {
   try {
     const result = await baseUpdate(model, req.params.id, req.body);
 
-    await invalidate(`${model}:*`);
+    
     return res.status(201).json(result);
   } catch (err) {
     return res.status(500).json({ error: `Error: ${err.message}` });
@@ -68,7 +63,7 @@ const patch = async (req, res) => {
   try {
     const result = await basePatch(model, req.params.id, req.query.type);
 
-    await invalidate(`${model}:*`);
+    
     return res.status(201).json(result);
   } catch (err) {
     return res.status(500).json({ error: `Error :${err}` });
@@ -79,7 +74,7 @@ const destroy = async (req, res) => {
   try {
     const result = await baseDestroy(model, req.params.id);
 
-    await invalidate(`${model}:*`);
+    
     return res.status(201).json(result);
   } catch (err) {
     return res.status(500).json({ error: `Error: ${err.message}` });
@@ -92,5 +87,4 @@ module.exports = {
   update,
   patch,
   destroy,
-  refresh,
 };

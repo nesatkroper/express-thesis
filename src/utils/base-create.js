@@ -1,4 +1,4 @@
-const prisma = require("@/provider/client");
+const prisma = require("@/lib/prisma");
 const { modelSchemas } = require("./base-schema");
 const { convertData } = require("./convert-data");
 

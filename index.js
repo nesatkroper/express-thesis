@@ -16,12 +16,10 @@ const {
   allowedOrigins,
   allowedHeaders,
   methods,
-  transports,
 } = require("@/constants/cors");
 
 const dbLogger = require("@/middleware/logger-middleware");
 const logger = require("@/middleware/app-logger-middleware");
-
 const app = express();
 const server = http.createServer(app);
 
@@ -70,7 +68,6 @@ app.use(
 
 app.use("/v1", router);
 
-
 app.use((req, res, next) => {
   console.log(`Request from: ${req.headers.origin}`);
   next();
@@ -80,14 +77,15 @@ const startServer = async () => {
   try {
     const PORT = process.env.PORT || 5000;
 
-    await Promise.all(prisma.$connect());
-    console.log("✅ All services connected successfully");
+    await prisma.$connect();  // Just await the single connection
+    console.log("✅ Database connected successfully");
 
     server.listen(PORT, () => {
       console.log(`✅ Server running on port http://localhost:${PORT}`);
     });
   } catch (error) {
-    console.error("Error :", error);
+    console.error("Server startup error:", error);
+    process.exit(1); 
   }
 };
 

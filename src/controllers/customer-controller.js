@@ -1,12 +1,5 @@
 const path = require("path");
-const {
-  invalidate,
-  generateCacheKey,
-  getCached,
-  setCached,
-} = require("@/utils/base-redis");
 const { uploadPath } = require("@/provider/upload-path");
-
 const {
   baseSelect,
   baseCreate,
@@ -17,11 +10,6 @@ const {
 const prisma = require("@/provider/client");
 
 const model = "customer";
-
-const refresh = async (req, res) => {
-  await invalidate(`${model}:*`);
-  return res.status(203).json({ msg: "Cache invalidated" });
-};
 
 const select = async (req, res) => {
   try {
@@ -44,12 +32,6 @@ const select = async (req, res) => {
 
 const clientSelect = async (req, res) => {
   try {
-    const cacheKey = generateCacheKey(model, { id: req.params.id });
-    const cachedData = await getCached(cacheKey);
-    if (cachedData) {
-      console.log(`✅ Serving ${model} from cache`);
-      return res.status(200).json(cachedData);
-    }
     const result = await prisma[model].findMany({
       where: {
         employeeId: req.params.id,
@@ -67,7 +49,6 @@ const clientSelect = async (req, res) => {
     if (!result || (Array.isArray(result) && !result.length))
       return res.status(404).json({ msg: "No data found" });
 
-    await setCached(cacheKey, result);
     return res.status(200).json(result);
   } catch (err) {
     console.error("Error:", err);
@@ -81,7 +62,6 @@ const create = async (req, res) => {
   }
   try {
     const result = await baseCreate(model, req.body);
-    await invalidate(`${model}:*`);
     return res.status(201).json(result);
   } catch (err) {
     console.log(`Error creating ${model}:`, err);
@@ -93,7 +73,6 @@ const update = async (req, res) => {
   try {
     const result = await baseUpdate(model, req.params.id, req.body);
 
-    await invalidate(`${model}:*`);
     return res.status(201).json(result);
   } catch (err) {
     return res.status(500).json({ error: `Error: ${err.message}` });
@@ -104,7 +83,6 @@ const patch = async (req, res) => {
   try {
     const result = await basePatch(model, req.params.id, req.query.type);
 
-    await invalidate(`${model}:*`);
     return res.status(201).json(result);
   } catch (err) {
     return res.status(500).json({ error: `Error :${err}` });
@@ -115,7 +93,6 @@ const destroy = async (req, res) => {
   try {
     const result = await baseDestroy(model, req.params.id);
 
-    await invalidate(`${model}:*`);
     return res.status(201).json(result);
   } catch (err) {
     return res.status(500).json({ error: `Error: ${err.message}` });
@@ -166,7 +143,6 @@ const createinfo = async (req, res) => {
     const data = { ...req.body, picture };
 
     const result = await baseCreate(`${model}info`, data);
-    await invalidate(`${model}info:*`);
     return res.status(201).json(result);
   } catch (err) {
     console.log(`Error creating ${model}:`, err);
@@ -184,7 +160,6 @@ const updateinfo = async (req, res) => {
       uploadPath
     );
 
-    await invalidate(`${model}info:*`);
     return res.status(201).json(result);
   } catch (err) {
     return res.status(500).json({ error: `Error: ${err.message}` });
@@ -192,7 +167,6 @@ const updateinfo = async (req, res) => {
 };
 
 module.exports = {
-  refresh,
   select,
   clientSelect,
   create,

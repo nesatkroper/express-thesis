@@ -1,4 +1,4 @@
-const prisma = require("@/provider/client");
+const prisma = require("@/lib/prisma");
 
 const baseDestroy = async (model, id, options = {}) => {
   // @Validate model exists
