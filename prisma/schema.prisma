@@ -1,461 +1,144 @@
 generator client {
-  provider        = "prisma-client-js"
-  previewFeatures = ["postgresqlExtensions"]
+  provider = "prisma-client-js"
 }
 
 datasource db {
-  provider   = "postgresql"
-  url        = env("DATABASE_URL")
-  extensions = [pgcrypto]
-}
-
-model Address {
-  addressId  String         @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  cityId     Int?
-  stateId    Int?
-  latitude   Float?
-  longitude  Float?
-  customerId String?        @unique @db.Uuid
-  employeeId String?        @unique @db.Uuid
-  status     Status         @default(active)
-  createdAt  DateTime       @default(now())
-  updatedAt  DateTime       @updatedAt
-  city       City?          @relation(fields: [cityId], references: [cityId])
-  customer   Customer?      @relation(fields: [customerId], references: [customerId])
-  employee   Employee?      @relation(fields: [employeeId], references: [employeeId])
-  state      State?         @relation(fields: [stateId], references: [stateId])
-  image      Imageaddress[]
-}
-
-model Attendance {
-  attendanceId String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  employeeId   String   @db.Uuid
-  datetime     DateTime @default(now())
-  note         String?
-  status       Status   @default(active)
-  employee     Employee @relation(fields: [employeeId], references: [employeeId])
-}
-
-model Auth {
-  authId       String         @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  email        String         @unique @db.VarChar(255)
-  password     String         @db.VarChar(255)
-  roleId       String         @db.Uuid
-  employeeId   String?        @unique @db.Uuid
-  status       AccountStatus  @default(active)
-  createdAt    DateTime       @default(now())
-  updatedAt    DateTime       @updatedAt
-  lastLoginAt  DateTime?
-  employee     Employee?      @relation(fields: [employeeId], references: [employeeId])
-  role         Role           @relation(fields: [roleId], references: [roleId])
-  logs         AuthLog[]
-  cart         Cart[]
-  notification Notification[]
-  token        Token[]
-
-  @@index([email])
-  @@index([status])
-  @@index([createdAt])
-}
-
-model AuthLog {
-  id           Int      @id @default(autoincrement())
-  authId       String   @db.Uuid
-  method       String
-  url          String
-  status       Int
-  responseTime Float
-  ip           String
-  userAgent    String?
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
-  auth         Auth     @relation(fields: [authId], references: [authId])
-}
-
-model Cart {
-  cartId    String     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  authId    String?    @db.Uuid
-  userId    String?    @db.Uuid
-  productId String     @db.Uuid
-  quantity  Int
-  status    Status     @default(active)
-  createdAt DateTime   @default(now())
-  updatedAt DateTime   @updatedAt
-  auth      Auth?      @relation(fields: [authId], references: [authId])
-  product   Product    @relation(fields: [productId], references: [productId])
-  user      User?      @relation(fields: [userId], references: [userId])
-  note      Cartnote[]
-
-  @@unique([authId, productId], name: "authId_productId")
-}
-
-model Cartnote {
-  cartnoteId String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  cartId     String @db.Uuid
-  note       String
-  status     Status @default(active)
-  cart       Cart   @relation(fields: [cartId], references: [cartId])
-}
-
-model Category {
-  categoryId   String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  picture      String?
-  categoryName String
-  categoryCode String?
-  memo         String?
-  status       Status    @default(active)
-  createdAt    DateTime  @default(now())
-  updatedAt    DateTime  @updatedAt
-  products     Product[]
-}
-
-model City {
-  cityId    Int       @id @default(autoincrement())
-  stateId   Int
-  name      String
-  addresses Address[]
-  state     State     @relation(fields: [stateId], references: [stateId])
-
-  @@unique([name, stateId])
-}
-
-model Customer {
-  customerId String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  firstName  String
-  lastName   String
-  gender     Gender        @default(male)
-  phone      String?
-  status     Status        @default(active)
-  employeeId String?       @db.Uuid
-  createdAt  DateTime      @default(now())
-  updatedAt  DateTime      @updatedAt
-  address    Address?
-  employee   Employee?     @relation(fields: [employeeId], references: [employeeId])
-  info       Customerinfo?
-  sales      Sale[]
-  user       User?
-}
-
-model Customerinfo {
-  customerId String    @unique @db.Uuid
-  picture    String?
-  region     String?
-  email      String?   @unique
-  note       String?
-  govId      String?
-  govPicture String?
-  govExpire  DateTime?
-  status     Status    @default(active)
-  customer   Customer  @relation(fields: [customerId], references: [customerId])
-}
-
-model Department {
-  departmentId   String     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  departmentName String
-  departmentCode String?
-  memo           String?
-  status         Status     @default(active)
-  createdAt      DateTime   @default(now())
-  updatedAt      DateTime   @updatedAt
-  employees      Employee[]
-  positions      Position[]
-}
-
-model Employee {
-  employeeId   String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  employeeCode String?       @unique
-  firstName    String
-  lastName     String
-  gender       Gender        @default(male)
-  dob          DateTime?
-  phone        String?       @unique
-  positionId   String        @db.Uuid
-  departmentId String        @db.Uuid
-  salary       Decimal       @db.Decimal(10, 2)
-  hiredDate    DateTime?
-  status       Status        @default(active)
-  createdAt    DateTime      @default(now())
-  updatedAt    DateTime      @updatedAt
-  address      Address?
-  attendances  Attendance[]
-  auth         Auth?
-  customer     Customer[]
-  department   Department    @relation(fields: [departmentId], references: [departmentId])
-  position     Position      @relation(fields: [positionId], references: [positionId])
-  info         Employeeinfo?
-  payment      Payment[]
-  sales        Sale[]
-}
-
-model Employeeinfo {
-  employeeId String    @unique @db.Uuid
-  picture    String?
-  region     String?
-  email      String?   @unique
-  note       String?
-  status     Status    @default(active)
-  govExpire  DateTime?
-  govId      String?
-  govPicture String?
-  employee   Employee  @relation(fields: [employeeId], references: [employeeId])
-}
-
-model Imageaddress {
-  imageId   String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  imageUrl  String
-  imageType String?
-  addressId String   @db.Uuid
-  status    Status   @default(active)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  address   Address  @relation(fields: [addressId], references: [addressId])
-}
-
-model Log {
-  id           Int      @id @default(autoincrement())
-  method       String
-  url          String
-  status       Int
-  responseTime Float
-  ip           String
-  userAgent    String?
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
-}
-
-model Notification {
-  notificationId String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  authId         String?  @db.Uuid
-  userId         String?  @db.Uuid
-  title          String
-  content        String
-  status         Status   @default(active)
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
-  auth           Auth?    @relation(fields: [authId], references: [authId])
-  user           User?    @relation(fields: [userId], references: [userId])
-}
-
-model Payment {
-  paymentId     String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  employeeId    String   @db.Uuid
-  saleId        String   @db.Uuid
-  reservationId String   @db.Uuid
-  invoice       String?
-  hash          String
-  fromAccountId String
-  toAccountId   String
-  currency      String
-  amount        Decimal  @db.Decimal(12, 2)
-  externalRef   String
-  status        Status   @default(active)
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
-  employee      Employee @relation(fields: [employeeId], references: [employeeId])
-  sale          Sale     @relation(fields: [saleId], references: [saleId])
-}
-
-model Position {
-  positionId   String     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  departmentId String     @db.Uuid
-  positionName String?
-  positionCode String?
-  memo         String?
-  status       Status     @default(active)
-  createdAt    DateTime   @default(now())
-  updatedAt    DateTime   @updatedAt
-  employees    Employee[]
-  department   Department @relation(fields: [departmentId], references: [departmentId])
-}
-
-model Product {
-  productId    String       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  productName  String
-  productCode  String?
-  categoryId   String       @db.Uuid
-  picture      String?
-  unit         String?
-  capacity     String?
-  sellPrice    Decimal      @default(0.00) @db.Decimal(10, 2)
-  costPrice    Decimal      @default(0.00) @db.Decimal(10, 2)
-  discountRate Int          @default(0)
-  status       Status       @default(active)
-  desc         String?
-  createdAt    DateTime     @default(now())
-  updatedAt    DateTime     @updatedAt
-  cart         Cart[]
-  category     Category     @relation(fields: [categoryId], references: [categoryId])
-  saledetails  Saledetail[]
-  stocks       Stock?
-  entry        Stockentry[]
-}
-
-model Stock {
-  stockId   String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  productId String   @unique @db.Uuid
-  memo      String?
-  status    Status   @default(active)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  quantity  Int      @default(0)
-  product   Product  @relation(fields: [productId], references: [productId])
-
-  @@index([productId])
-}
-
-model Stockentry {
-  entryId    String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  quantity   Int       @default(0)
-  memo       String?
-  status     Status    @default(active)
-  entryPrice Decimal   @default(0.00) @db.Decimal(12, 2)
-  entryDate  DateTime?
-  createdAt  DateTime  @default(now())
-  updatedAt  DateTime  @updatedAt
-  productId  String    @db.Uuid
-  supplierId String    @db.Uuid
-  product    Product   @relation(fields: [productId], references: [productId])
-  supplier   Supplier  @relation(fields: [supplierId], references: [supplierId])
-  invoice    String?
-
-  @@index([productId])
-  @@index([supplierId])
-}
-
-model Role {
-  roleId       String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  name         String   @unique
-  description  String?
-  status       Status   @default(active)
-  isSystemRole Boolean  @default(false)
-  createdAt    DateTime @default(now())
-  auths        Auth[]
-
-  @@index([name])
-}
-
-model Sale {
-  saleId      String       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  employeeId  String       @db.Uuid
-  customerId  String       @db.Uuid
-  saleDate    DateTime     @default(now())
-  amount      Decimal      @db.Decimal(12, 2)
-  status      Status       @default(active)
-  invoice     String?
-  createdAt   DateTime     @default(now())
-  updatedAt   DateTime     @updatedAt
-  memo        String?
-  payment     Payment[]
-  customer    Customer     @relation(fields: [customerId], references: [customerId])
-  employee    Employee     @relation(fields: [employeeId], references: [employeeId])
-  saledetails Saledetail[]
-
-  @@index([employeeId])
-  @@index([customerId])
-}
-
-model Saledetail {
-  saledetailId String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  saleId       String   @db.Uuid
-  productId    String   @db.Uuid
-  quantity     Int
-  amount       Decimal  @db.Decimal(12, 2)
-  status       Status   @default(active)
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
-  memo         String?
-  product      Product  @relation(fields: [productId], references: [productId])
-  sale         Sale     @relation(fields: [saleId], references: [saleId])
-
-  @@index([saleId])
-  @@index([productId])
-}
-
-model State {
-  stateId   Int       @id @default(autoincrement())
-  name      String    @unique
-  addresses Address[]
-  cities    City[]
-}
-
-model Supplier {
-  supplierId   String       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  supplierName String
-  companyName  String?
-  phone        String?
-  email        String?
-  address      String?
-  status       Status       @default(active)
-  createdAt    DateTime     @default(now())
-  updatedAt    DateTime     @updatedAt
-  entry        Stockentry[]
-}
-
-model Token {
-  tokenId    String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  authId     String?  @db.Uuid
-  userId     String?  @db.Uuid
-  token      String   @unique
-  deviceInfo String   @default("")
-  ipAddress  String   @default("")
-  expiresAt  DateTime
-  createdAt  DateTime @default(now())
-  auth       Auth?    @relation(fields: [authId], references: [authId])
-  user       User?    @relation(fields: [userId], references: [userId])
-
-  @@index([token])
-  @@index([expiresAt])
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
 model User {
-  userId       String         @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  email        String         @unique @db.VarChar(255)
-  password     String         @db.VarChar(255)
-  customerId   String?        @unique @db.Uuid
-  status       AccountStatus  @default(active)
-  createdAt    DateTime       @default(now())
-  updatedAt    DateTime       @updatedAt
-  cart         Cart[]
-  notification Notification[]
-  token        Token[]
-  customer     Customer?      @relation(fields: [customerId], references: [customerId])
-
-  @@index([email])
+  userId    String   @id @default(uuid())
+  email     String   @unique
+  password  String
+  fullName  String
+  role      Role     @default(STUDENT)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  student   Student?
+  teacher   Teacher?
 }
 
-enum AccountStatus {
-  active
-  inactive
-  suspended
-  pending
+model Student {
+  studentId   String       @id @default(uuid())
+  userId      String       @unique
+  grade       String
+  section     String
+  dob         DateTime
+  attendance  Attendance[]
+  enrollments Enrollment[]
+  grades      Grade[]
+  guardians   Guardian[]
+  payment     Payment[]
+  user        User         @relation(fields: [userId], references: [userId])
 }
 
-enum Gender {
-  male
-  female
-  others
+model Teacher {
+  teacherId String  @id @default(uuid())
+  userId    String  @unique
+  subject   String
+  bio       String?
+  classes   Class[]
+  user      User    @relation(fields: [userId], references: [userId])
+}
+
+model Class {
+  classId     String       @id @default(uuid())
+  name        String
+  subjectId   String
+  teacherId   String
+  scheduleId  String?
+  attendance  Attendance[]
+  schedule    Schedule?    @relation(fields: [scheduleId], references: [scheduleId])
+  subject     Subject      @relation(fields: [subjectId], references: [subjectId])
+  teacher     Teacher      @relation(fields: [teacherId], references: [teacherId])
+  enrollments Enrollment[]
+  grade       Grade[]
+}
+
+model Subject {
+  subjectId String  @id @default(uuid())
+  name      String
+  code      String  @unique
+  classes   Class[]
+}
+
+model Schedule {
+  scheduleId String   @id @default(uuid())
+  classId    String
+  day        String
+  startTime  DateTime
+  endTime    DateTime
+  class      Class[]
+}
+
+model Enrollment {
+  enrollmentId String  @id @default(uuid())
+  studentId    String
+  classId      String
+  class        Class   @relation(fields: [classId], references: [classId])
+  student      Student @relation(fields: [studentId], references: [studentId])
+}
+
+model Attendance {
+  attendanceId String           @id @default(uuid())
+  date         DateTime
+  status       AttendanceStatus
+  studentId    String
+  classId      String
+  class        Class            @relation(fields: [classId], references: [classId])
+  student      Student          @relation(fields: [studentId], references: [studentId])
+}
+
+model Grade {
+  gradeId   String   @id @default(uuid())
+  studentId String
+  classId   String
+  score     Float
+  examType  ExamType
+  class     Class    @relation(fields: [classId], references: [classId])
+  student   Student  @relation(fields: [studentId], references: [studentId])
+}
+
+model Guardian {
+  gurdianId String  @id @default(uuid())
+  fullName  String
+  contact   String
+  studentId String
+  student   Student @relation(fields: [studentId], references: [studentId])
+}
+
+model Payment {
+  paymentId String        @id @default(uuid())
+  studentId String
+  amount    Float
+  status    PaymentStatus
+  paidAt    DateTime?
+  student   Student       @relation(fields: [studentId], references: [studentId])
+}
+
+enum Role {
+  ADMIN
+  TEACHER
+  STUDENT
+}
+
+enum AttendanceStatus {
+  PRESENT
+  ABSENT
+  LATE
+  EXCUSED
+}
+
+enum ExamType {
+  MIDTERM
+  FINAL
+  QUIZ
+  ASSIGNMENT
 }
 
 enum PaymentStatus {
-  paid
-  pending
-  cancel
+  PENDING
+  PAID
+  FAILED
 }
-
-enum PaymentMethod {
-  cash
-  creditCard
-  khqr
-  leave
-}
-
-enum Status {
-  active
-  inactive
-}
-
-enum StockType {
-  in
-  out
-}
-
